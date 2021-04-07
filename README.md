@@ -10,6 +10,12 @@ Analog Output: D13 (sampled wave), D7 (generated wave)
 
 other pin: 5V, RX, TX, GND, RES (uLCD)
 
+需要按下select按鍵，才會有變化(產生波+sample, uLCD變化)
+
+按鍵由左至右為 up, down, select
+
+![](https://i.imgur.com/d6w2wLw.jpg)
+
 (2) what are the results
 
 genrated wave
