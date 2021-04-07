@@ -2,9 +2,9 @@
 #include "uLCD_4DGL.h"
 using namespace std::chrono;
 
-DigitalIn bt_up(D12);      // D12
-DigitalIn bt_down(D11);    // D11
-DigitalIn bt_sl(D10);      // D10
+InterruptIn bt_up(D12);      // D12
+InterruptIn bt_down(D11);    // D11
+InterruptIn bt_sl(D10);      // D10
 DigitalOut led_down(LED2);
 DigitalOut led_sl(LED3);
 AnalogOut  aout(D7);
@@ -13,6 +13,7 @@ AnalogIn ain(A0);
 Timer t;
 bool sample_finished = 0;
 int freq = 0;
+int pre_freq = 1;
 int sample = 500;
 float ADCdata[500];
 // generate wave
@@ -20,6 +21,39 @@ Thread thread;
 //Thread Wave_Sampling;
 
 uLCD_4DGL uLCD(D1, D0, D2);
+
+void up () {
+    if (freq == 1) {    // 1
+        pre_freq = 1;
+    } else if (freq == 2) { // 1/2
+        pre_freq = 1;
+    } else if (freq == 3) { // 1/4
+        pre_freq = 2;
+    } else if (freq == 4) { // 1
+        pre_freq = 3;
+    } else if (freq == 0) {
+        pre_freq = 1;
+    }
+}
+void down () {
+    if (freq == 1) {    // 1
+        pre_freq = 2;
+    } else if (freq == 2) { // 1/2
+        pre_freq = 3;
+    } else if (freq == 3) { // 1/4
+        pre_freq = 4;
+    } else if (freq == 4) { // 1
+        pre_freq = 4;
+    } else if (freq == 0) {
+        pre_freq = 4;
+    }
+}
+
+void sl () {
+    freq = pre_freq;
+    //wave_sampling();
+    pre_freq = 0;
+}
 
 void wave()
 {   
@@ -73,15 +107,7 @@ void wave_sampling() {
 
 int main()
 {
-    int pre_freq = 1;
     // bool sl = 0;
-
-    // Optional: set mode as PullUp/PullDown/PullNone/OpenDrain
-    bt_up.mode(PullDown);
-    bt_down.mode(PullDown);
-    bt_sl.mode(PullDown);
-    // LED initialization
-    //led_up = 0;
     led_down = 0;
     led_sl = 0;
     // uLCD initialization
@@ -102,6 +128,9 @@ int main()
     uLCD.locate(1,8);
     uLCD.printf("slew rate: 1/8");
     thread.start(wave);
+    bt_up.rise(&up);
+    bt_down.rise(&down);
+    bt_sl.rise(&sl);
     //Wave_Sampling.start(wave_sampling);
     //button.rise(&wave_sampling);
 
@@ -122,18 +151,9 @@ int main()
             uLCD.printf("              ");
 
             if (pre_freq == 0) {
-                wave_sampling();
-                pre_freq = 1;
-            }
-            if (bt_down.read() == 1) {
-                pre_freq = 2;
-            } else if (bt_up.read()){
-                pre_freq = 1;
-            } else if (bt_sl.read()) {
-                freq = pre_freq;
                 //wave_sampling();
-                pre_freq = 0;
-            }
+                pre_freq = 1;
+            } 
         } else if (freq == 2) { // 1/2
             // show freq_2 on uLCD
             uLCD.locate(1,2);
@@ -146,18 +166,9 @@ int main()
             uLCD.printf("              ");
 
             if (pre_freq == 0) {
-                wave_sampling();
-                pre_freq = 2;
-            }
-            if (bt_down.read()) {
-                pre_freq = 3;
-            } else if (bt_up.read()) {
-                pre_freq = 1;
-            } else if (bt_sl.read()) {
-                freq = pre_freq;
                 //wave_sampling();
-                pre_freq = 0;
-            }
+                pre_freq = 2;
+            } 
         } else if (freq == 3) { // 1/4
             // show freq_2 on uLCD
             uLCD.locate(1,2);
@@ -170,17 +181,8 @@ int main()
             uLCD.printf("              ");
 
             if (pre_freq == 0) {
-                wave_sampling();
-                pre_freq = 3;
-            }
-            if (bt_down.read()) {
-                pre_freq = 4;
-            } else if (bt_up.read()) {
-                pre_freq = 2;
-            } else if (bt_sl.read()) {
-                freq = pre_freq;
                 //wave_sampling();
-                pre_freq = 0;
+                pre_freq = 3;
             }
         } else if (freq == 4) { // 1
             // show freq_2 on uLCD
@@ -194,37 +196,19 @@ int main()
             uLCD.printf("slew rate: 1/8");
 
             if (pre_freq == 0) {
-                wave_sampling();
-                pre_freq = 4;
-            }
-            if (bt_down.read()) {
-                pre_freq = 4;
-            } else if (bt_up.read()) {
-                pre_freq = 3;
-            } else if (bt_sl.read()) {
-                freq = pre_freq;
                 //wave_sampling();
-                pre_freq = 0;
+                pre_freq = 4;
             }
         } else if (freq == 0) {
             // show freq_1 and freq_2 on uLCD
             uLCD.locate(1,2);
-            uLCD.printf("slew rate: 1/8");
-            uLCD.locate(1,4);
-            uLCD.printf("slew rate: 1/4");
-            uLCD.locate(1,6);
-            uLCD.printf("slew rate: 1/2");
-            uLCD.locate(1,8);
             uLCD.printf("slew rate:   1");
-
-            if (bt_up.read() == 1) {
-                pre_freq = 1;
-            } else if (bt_down.read() == 1) {
-                pre_freq = 4;
-            } else if (bt_sl.read() == 1) {
-                freq = pre_freq;
-                pre_freq = 0;
-            }
+            uLCD.locate(1,4);
+            uLCD.printf("slew rate: 1/2");
+            uLCD.locate(1,6);
+            uLCD.printf("slew rate: 1/4");
+            uLCD.locate(1,8);
+            uLCD.printf("slew rate: 1/8");
         }
     }
 }
