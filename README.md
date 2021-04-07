@@ -17,3 +17,12 @@ genrated wave
 
 python plot
 ![](https://i.imgur.com/p7SIErm.png)
+
+circuit
+![](https://i.imgur.com/ee5gLyS.jpg)
+
+uLCD
+![](https://i.imgur.com/7x7Qbax.jpg)
+![](https://i.imgur.com/bgnsvun.jpg)
+![](https://i.imgur.com/IF7R2bX.jpg)
+![](https://i.imgur.com/kbHOKoJ.jpg)
