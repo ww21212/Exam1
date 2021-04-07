@@ -111,19 +111,19 @@ void wave()
 void wave_sampling() {
     int i = 0;
     sample_finished = 0;
-    //t.start();
+    t.start();
     for (i = 0; i < sample; i++){
         Aout = ain;
         ADCdata[i] = ain;
         ThisThread::sleep_for(1000ms/sample); // sampling rate = 500/s 實際166.666667/s
     }
     sample_finished = 1;
-    //t.stop();
-    //auto ms = chrono::duration_cast<chrono::milliseconds>(t.elapsed_time()).count();
+    t.stop();
+    auto ms = chrono::duration_cast<chrono::milliseconds>(t.elapsed_time()).count();
     for (i = 0; i < sample; i++) {
         printf("%f\r\n", ADCdata[i]);
     }
-    //printf ("Timer time: %llu ms\n", ms);
+    printf ("Timer time: %llu ms\n", ms);
 }
 
 
