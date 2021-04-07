@@ -1,8 +1,11 @@
 # Exam1
 
 (1) how to setup and run your program 
+
 Digital Input: D12, D11, D10 (used to read button)
+
 Analog Input: A0 (source wave used to sample wave)
+
 Analog Output: D13 (sampled wave), D7 (generated wave)
 
 other pin: 5V, RX, TX, GND, RES (uLCD)
