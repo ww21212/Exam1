@@ -18,7 +18,11 @@ int sample = 500;
 float ADCdata[500];
 // generate wave
 Thread thread;
+Thread eventThread;
 //Thread Wave_Sampling;
+
+EventQueue queue;
+void wave_sampling();
 
 uLCD_4DGL uLCD(D1, D0, D2);
 
@@ -51,28 +55,46 @@ void down () {
 
 void sl () {
     freq = pre_freq;
-    //wave_sampling();
-    pre_freq = 0;
+    queue.call(&wave_sampling);
+    //pre_freq = 0;
 }
 
 void wave()
 {   
     float i;
     while (1){
-        if (freq == 1 && !sample_finished) {        // 200Hz
-            for (i = 0.0f; i < 1; i+=0.0145635f) {
+        if (freq == 1 && !sample_finished) {        // 1
+            for (i = 0.0f; i < 0.909091; i+=0.00015319f) {
                 aout = i;
             }
-            for (i = 1.0f; i > 0.0f; i -= 0.001626f) {
+            wait_us(80000);
+            for (i = 0.909091f; i > 0.0f; i -= 0.00012132f) {
                 aout = i;
             }
-        } else if(freq == 2 && !sample_finished) {  // 1 Hz
-            for (i = 0.0f; i < 1; i += 0.0000731f) {
+        } else if(freq == 2 && !sample_finished) {  // 1/2 Hz
+            for (i = 0.0f; i < 0.909091; i+=0.000306380f) {
                 aout = i;
             }
-            for (i = 1.0f; i > 0.0f; i -= 0.00000812222f) {
+            wait_us(160000);
+            for (i = 0.909091f; i > 0.0f; i -= 0.00024264f) {
                 aout = i;
             }
+        } else if(freq == 3 && !sample_finished) {  // 1/4 Hz
+            for (i = 0.0f; i < 0.909091; i+=0.00061276f) {
+                aout = i;
+            }
+            wait_us(200000);
+            for (i = 0.909091f; i > 0.0f; i -= 0.00048529f) {
+                aout = i;
+            }
+        } else if(freq == 4 && !sample_finished) {  // 1/8 Hz
+            for (i = 0.0f; i < 0.909091; i+=0.00122552f) {
+                aout = i;
+            }
+            wait_us(220000);
+            for (i = 0.909091f; i > 0.0f; i -= 0.00097058f) {
+                aout = i;
+            } 
         } else if (!sample_finished) {    // >> 10*200Hz
             for (i = 0.0f; i < 1; i+=0.27f) {
                 aout = i;
@@ -107,6 +129,7 @@ void wave_sampling() {
 
 int main()
 {
+    eventThread.start(callback(&queue, &EventQueue::dispatch_forever));
     // bool sl = 0;
     led_down = 0;
     led_sl = 0;
